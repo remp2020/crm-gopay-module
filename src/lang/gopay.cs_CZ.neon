@@ -1,0 +1,16 @@
+config:
+	gopay_go_id:
+		name: GoPay Go ID
+		description: "Jedinečný identifikátor prodejního místa (např. <code>1111111111</code>), pro jeho ziskání je potřebné se zaregistrovat na stránce <a href=\"https://www.gopay.com/en/\">GoPay</a>"
+	gopay_client_id:
+		name: GoPay Client ID
+		description: "Jedinečný identifikátor obchodníka (např. <code>1111111111</code>), pro jeho ziskání je potřebné se zaregistrovat na stránce <a href=\"https://www.gopay.com/en/\">GoPay</a>"
+	gopay_client_secret:
+		name: GoPay Client secret
+		description: "Šifrovací klíč GoPay (např. <code>aaaBBBcD</code>), pro jeho ziskání je potřebné se zaregistrovat na stránce <a href=\"https://www.gopay.com/en/\">GoPay</a>"
+	gopay_test_mode:
+		name: GoPay Test Mode
+		description: "Pokud je povoleno, všechny platby jsou prováděny v testovacím módu, žádné peníze nebudou staženy."
+	gopay_eet_enabled:
+		name: GoPay zapnuté EET
+		description: Zapnutý EET reporting z platební brány GoPay

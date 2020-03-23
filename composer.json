@@ -1,0 +1,17 @@
+{
+  "name": "remp/crm-gopay-module",
+  "description": "GoPay Module",
+  "type": "library",
+  "homepage": "https://remp2020.com",
+  "license": "MIT",
+  "require": {
+    "php": "^7.1"
+  },
+  "minimum-stability": "dev",
+  "autoload": {
+    "psr-4": {
+      "Crm\\GoPayModule\\": "src/"
+    },
+    "classmap": ["src/"]
+  }
+}

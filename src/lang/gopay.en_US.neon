@@ -1,0 +1,16 @@
+config:
+	gopay_go_id:
+		name: GoPay Go ID
+		description: "Unique point of sale ID (napr. <code>1111111111</code>), you need to register on <a href=\"https://www.gopay.com/en/\">GoPay</a> to get one."
+	gopay_client_id:
+		name: GoPay Client ID
+		description: "Unique merchant ID (e.g. <code>1111111111</code>), you need to register on <a href=\"https://www.gopay.com/en/\">GoPay</a> to get one."
+	gopay_client_secret:
+		name: GoPay Client secret
+		description: "GoPay encryption key (e.g. <code>aaaBBBcD</code), you need to register on <a href=\"https://www.gopay.com/en/\">GoPay</a> to get one."
+	gopay_test_mode:
+		name: GoPay Test Mode
+		description: "If enabled, all payments are done in test mode, no money charge is made."
+	gopay_eet_enabled:
+		name: GoPay enabled EET
+		description: Enabled EET reporting from payment gateway GoPay

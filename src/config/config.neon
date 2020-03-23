@@ -1,0 +1,18 @@
+services:
+	moduleManager:
+		setup:
+			- addModule(Crm\GoPayModule\GoPayModule())
+
+	- Crm\GoPayModule\Seeders\ConfigsSeeder
+	- Crm\GoPayModule\Seeders\PaymentGatewaysSeeder
+	- Crm\GoPayModule\Api\GoPayNotificationHandler
+	- Crm\GoPayModule\Repository\GopayPaymentsRepository
+
+	goPay: Crm\GoPayModule\Gateways\GoPay
+	goPayRecurrent: Crm\GoPayModule\Gateways\GoPayRecurrent
+
+	gatewayFactory:
+		setup:
+			- registerGateway(gopay, Crm\GoPayModule\Gateways\GoPay)
+			- registerGateway(gopay_recurrent, Crm\GoPayModule\Gateways\GoPayRecurrent)
+
