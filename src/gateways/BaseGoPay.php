@@ -180,9 +180,6 @@ abstract class BaseGoPay extends GatewayAbstract
             'purchaseData' => [
                 'payer' => [
                     'default_payment_instrument' => 'PAYMENT_CARD',
-                    'contact' => [
-                        'email' => $payment->user->email,
-                    ]
                 ],
                 'target' => [
                     'type' => 'ACCOUNT',
@@ -199,6 +196,10 @@ abstract class BaseGoPay extends GatewayAbstract
                 ],
             ],
         ];
+
+        if (isset($payment->user->email)) {
+            $data['purchaseData']['payer']['contact']['email'] = $payment->user->email;
+        }
 
         if ($this->eetEnabled) {
             $data['purchaseData']['eet'] = $this->prepareEetItems($paymentItems);
