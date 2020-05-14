@@ -84,7 +84,7 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
         return isset($_GET['id']);
     }
 
-    public function charge($payment, $token)
+    public function charge($payment, $token): string
     {
         $this->initialize();
 
@@ -113,6 +113,8 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
             Debugger::log($exception);
             throw new GatewayFail($exception->getMessage(), $exception->getCode());
         }
+
+        return self::CHARGE_OK;
     }
 
     public function checkValid($token)
