@@ -114,6 +114,7 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
             throw new GatewayFail($exception->getMessage(), $exception->getCode());
         }
 
+        $this->checkChargeStatus($payment, $this->getResultCode());
         return self::CHARGE_OK;
     }
 
@@ -149,11 +150,35 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
 
     public function getResultCode()
     {
-        return $this->response->getData()['state'];
+        $err = $this->getError();
+        if ($err) {
+            return $err['error_code'];
+        }
+        // response might not be present if it's already processed payment
+        return $this->response->getData()['state'] ?? null;
     }
 
     public function getResultMessage()
     {
-        return $this->response->getData()['state'];
+        $err = $this->getError();
+        if ($err) {
+            if (isset($err['error_name'])) {
+                return sprintf("%s: %s", $err['error_name'], $err['message']);
+            }
+            if (isset($err['error_code'])) {
+                return $err['description'];
+            }
+            return 'FAILED';
+        }
+        // response might not be present if it's already processed payment
+        return $this->response->getData()['state'] ?? null;
+    }
+
+    protected function getError(): ?array
+    {
+        if (isset($this->response) && empty($this->response->getData()['errors'])) {
+            return null;
+        }
+        return reset($this->response->getData()['errors']);
     }
 }
