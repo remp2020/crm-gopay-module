@@ -126,16 +126,16 @@ abstract class BaseGoPay extends GatewayAbstract
             $values->setPaymentInstrument($data['payment_instrument']);
         }
         if (isset($data['payer']['payment_card'])) {
-            $values->setCardNumber($data['payer']['payment_card']['card_number'])
-                ->setCardExpiration($data['payer']['payment_card']['card_expiration'])
-                ->setCardBrand($data['payer']['payment_card']['card_brand'])
-                ->setIssuerCountry($data['payer']['payment_card']['card_issuer_country'])
-                ->setIssuerBank($data['payer']['payment_card']['card_issuer_bank']);
+            $values->setCardNumber($data['payer']['payment_card']['card_number'] ?? null)
+                ->setCardExpiration($data['payer']['payment_card']['card_expiration'] ?? null)
+                ->setCardBrand($data['payer']['payment_card']['card_brand'] ?? null)
+                ->setIssuerCountry($data['payer']['payment_card']['card_issuer_country'] ?? null)
+                ->setIssuerBank($data['payer']['payment_card']['card_issuer_bank'] ?? null);
         }
         if (isset($data['payer']['bank_account'])) {
-            $values->setAccountNumber($data['payer']['bank_account']['account_number'])
-                ->setBankCode($data['payer']['bank_account']['bank_code'])
-                ->setAccountName($data['payer']['bank_account']['account_name']);
+            $values->setAccountNumber($data['payer']['bank_account']['account_number'] ?? null)
+                ->setBankCode($data['payer']['bank_account']['bank_code'] ?? null)
+                ->setAccountName($data['payer']['bank_account']['account_name'] ?? null);
         }
         if (isset($data['payer']['contact']['email'])) {
             $values->setContactEmail($data['payer']['contact']['email']);
@@ -145,14 +145,14 @@ abstract class BaseGoPay extends GatewayAbstract
         }
         $values->setUrl($data['gw_url']);
         if (isset($data['recurrence'])) {
-            $values->setRecurrenceCycle($data['recurrence']['recurrence_cycle'])
-                ->setRecurrenceDateTo($data['recurrence']['recurrence_date_to'])
-                ->setRecurrenceState($data['recurrence']['recurrence_state']);
+            $values->setRecurrenceCycle($data['recurrence']['recurrence_cycle'] ?? null)
+                ->setRecurrenceDateTo($data['recurrence']['recurrence_date_to'] ?? null)
+                ->setRecurrenceState($data['recurrence']['recurrence_state'] ?? null);
         }
         if (isset($data['eet_code'])) {
-            $values->setEetFik($data['eet_code']['fik'])
-                ->setEetBkp($data['eet_code']['bkp'])
-                ->setEetPkp($data['eet_code']['pkp']);
+            $values->setEetFik($data['eet_code']['fik'] ?? null)
+                ->setEetBkp($data['eet_code']['bkp'] ?? null)
+                ->setEetPkp($data['eet_code']['pkp'] ?? null);
         }
         return $values;
     }
