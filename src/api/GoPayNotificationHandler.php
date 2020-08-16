@@ -32,6 +32,7 @@ class GoPayNotificationHandler extends ApiHandler
     {
         return [
             new InputParam(InputParam::TYPE_GET, 'id', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_GET, 'parent_id', InputParam::OPTIONAL),
         ];
     }
 
@@ -49,7 +50,7 @@ class GoPayNotificationHandler extends ApiHandler
         }
         $params = $paramsProcessor->getValues();
 
-        $result = $this->gopay->notification($params['id']);
+        $result = $this->gopay->notification($params['id'], $params['parent_id'] ?? null);
         if (!$result) {
             $response = new JsonResponse(['status' => 'error', 'message' => 'payment not found']);
             $response->setHttpCode(Response::S404_NOT_FOUND);

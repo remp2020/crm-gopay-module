@@ -32,7 +32,7 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
         return $data;
     }
 
-    public function notification($id): bool
+    public function notification(string $id, ?string $parentId = null): bool
     {
         $this->initialize();
 
@@ -54,16 +54,28 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
         $data = $this->response->getData();
         $this->gopayPaymentsRepository->updatePayment($payment, $this->buildGopayPaymentValues($data));
 
-        if ($payment->status != PaymentsRepository::STATUS_PAID && $data['state'] == self::STATE_PAID) {
-            $this->paymentsRepository->updateStatus($payment, PaymentsRepository::STATUS_PAID, true);
+        $this->paymentLogsRepository->add(
+            $this->response->isSuccessful() ? 'OK' : 'ERROR',
+            json_encode($data),
+            $parentId ? 'gopay-notification-recurrent' : 'gopay-notification',
+            $payment->id
+        );
 
-            if ((boolean)$payment->payment_gateway->is_recurrent) {
-                $recurrentPayment = $this->recurrentPaymentsRepository->recurrent($payment);
-                if ($recurrentPayment) {
-                    $this->recurrentPaymentsRepository->setCharged($recurrentPayment, $payment, 'OK', 'OK');
-                } else {
-                    $this->recurrentPaymentsRepository->createFromPayment($payment, $this->getRecurrentToken());
-                }
+        if ($payment->status != PaymentsRepository::STATUS_PAID && $data['state'] == self::STATE_PAID) {
+            if ((boolean) $payment->payment_gateway->is_recurrent) {
+                $recurrentPayment = $this->recurrentPaymentsRepository->findByPayment($payment);
+                $this->recurrentPaymentsProcessor->processChargedRecurrent($recurrentPayment, $this->getResultCode(), $this->getResultMessage());
+            } else {
+                $this->paymentsRepository->updateStatus($payment, PaymentsRepository::STATUS_PAID, true);
+            }
+        }
+
+        if (in_array($data['state'], [self::STATE_CANCELED, self::STATE_TIMEOUTED])) {
+            if ((boolean) $payment->payment_gateway->is_recurrent) {
+                $recurrentPayment = $this->recurrentPaymentsRepository->findByPayment($payment);
+                $this->recurrentPaymentsProcessor->processFailedRecurrent($recurrentPayment, $this->getResultCode(), $this->getResultMessage());
+            } else {
+                $this->paymentsRepository->updateStatus($payment, $data['state'] === self::STATE_TIMEOUTED ? PaymentsRepository::STATUS_TIMEOUT : PaymentsRepository::STATUS_FAIL, true);
             }
         }
 
@@ -114,7 +126,13 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
             throw new GatewayFail($exception->getMessage(), $exception->getCode());
         }
 
+        $this->gopayPaymentsRepository->add($payment, $this->response->getTransactionId(), $this->response->getTransactionReference());
         $this->checkChargeStatus($payment, $this->getResultCode());
+
+        if ($this->response->getData()['state'] === self::STATE_CREATED) {
+            return self::CHARGE_PENDING;
+        }
+
         return self::CHARGE_OK;
     }
 
