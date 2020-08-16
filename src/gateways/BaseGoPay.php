@@ -5,6 +5,8 @@ namespace Crm\GoPayModule\Gateways;
 use Crm\GoPayModule\Repository\GopayPaymentsRepository;
 use Crm\GoPayModule\Repository\GopayPaymentValues;
 use Crm\PaymentsModule\Gateways\GatewayAbstract;
+use Crm\PaymentsModule\RecurrentPaymentsProcessor;
+use Crm\PaymentsModule\Repository\PaymentLogsRepository;
 use Crm\PaymentsModule\Repository\PaymentsRepository;
 use Crm\PaymentsModule\Repository\RecurrentPaymentsRepository;
 use Nette\Database\Table\IRow;
@@ -20,6 +22,10 @@ abstract class BaseGoPay extends GatewayAbstract
 {
     // https://doc.gopay.com/cs/#stavy-plateb
     const STATE_PAID = 'PAID';
+    const STATE_CREATED = 'CREATED';
+    const STATE_CANCELED = 'CANCELED';
+    const STATE_TIMEOUTED = 'TIMEOUTED';
+    const STATE_AUTHORIZED = 'AUTHORIZED';
 
     // https://doc.gopay.com/en/#payment-substate
     const PENDING_PAYMENT_SUB_STATE = ['_101', '_102'];
@@ -33,7 +39,11 @@ abstract class BaseGoPay extends GatewayAbstract
 
     protected $recurrentPaymentsRepository;
 
+    protected $recurrentPaymentsProcessor;
+
     protected $eventEmitter;
+
+    protected $paymentLogsRepository;
 
     protected $eetEnabled = false;
 
@@ -44,14 +54,18 @@ abstract class BaseGoPay extends GatewayAbstract
         ITranslator $translator,
         GopayPaymentsRepository $gopayPaymentsRepository,
         PaymentsRepository $paymentsRepository,
+        RecurrentPaymentsProcessor $recurrentPaymentsProcessor,
+        PaymentLogsRepository $paymentLogsRepository,
         RecurrentPaymentsRepository $recurrentPaymentsRepository,
         Emitter $eventEmitter
     ) {
         parent::__construct($linkGenerator, $applicationConfig, $httpResponse, $translator);
         $this->paymentsRepository = $paymentsRepository;
-        $this->recurrentPaymentsRepository = $recurrentPaymentsRepository;
+        $this->recurrentPaymentsProcessor = $recurrentPaymentsProcessor;
         $this->eventEmitter = $eventEmitter;
         $this->gopayPaymentsRepository = $gopayPaymentsRepository;
+        $this->paymentLogsRepository = $paymentLogsRepository;
+        $this->recurrentPaymentsRepository = $recurrentPaymentsRepository;
     }
 
     protected function initialize()
