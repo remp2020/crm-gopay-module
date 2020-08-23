@@ -8,7 +8,10 @@ use Crm\ApiModule\Api\ApiHandler;
 use Crm\ApiModule\Params\InputParam;
 use Crm\ApiModule\Params\ParamsProcessor;
 use Crm\GoPayModule\Gateways\GoPayRecurrent;
+use Crm\GoPayModule\Notification\InvalidGopayResponseException;
+use Crm\GoPayModule\Notification\PaymentNotFoundException;
 use Nette\Http\Response;
+use Tracy\Debugger;
 
 /**
  * Class GoPayNotificationHandler
@@ -50,11 +53,15 @@ class GoPayNotificationHandler extends ApiHandler
         }
         $params = $paramsProcessor->getValues();
 
-        $result = $this->gopay->notification($params['id'], $params['parent_id'] ?? null);
-        if (!$result) {
-            $response = new JsonResponse(['status' => 'error', 'message' => 'payment not found']);
-            $response->setHttpCode(Response::S404_NOT_FOUND);
+        try {
+            $result = $this->gopay->notification($params['id'], $params['parent_id'] ?? null);
+        } catch (InvalidGopayResponseException $e) {
+            Debugger::log($e, Debugger::EXCEPTION);
+            $response = new JsonResponse(['status' => 'invalid_response']);
+            $response->setHttpCode(Response::S400_BAD_REQUEST);
             return $response;
+        } catch (PaymentNotFoundException $e) {
+            Debugger::log($e, Debugger::EXCEPTION);
         }
 
         $response = new JsonResponse(['status' => 'ok']);
