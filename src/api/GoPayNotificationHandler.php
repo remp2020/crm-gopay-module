@@ -9,6 +9,7 @@ use Crm\ApiModule\Params\InputParam;
 use Crm\ApiModule\Params\ParamsProcessor;
 use Crm\GoPayModule\Gateways\GoPayRecurrent;
 use Nette\Http\Response;
+use Tracy\Debugger;
 
 /**
  * Class GoPayNotificationHandler
@@ -52,8 +53,9 @@ class GoPayNotificationHandler extends ApiHandler
 
         $result = $this->gopay->notification($params['id'], $params['parent_id'] ?? null);
         if (!$result) {
-            $response = new JsonResponse(['status' => 'error', 'message' => 'payment not found']);
-            $response->setHttpCode(Response::S404_NOT_FOUND);
+            Debugger::log('Gopay notification payment not found: ' . $params['id'], Debugger::EXCEPTION);
+            $response = new JsonResponse(['status' => 'ok']);
+            $response->setHttpCode(Response::S200_OK);
             return $response;
         }
 

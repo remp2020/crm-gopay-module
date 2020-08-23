@@ -64,7 +64,11 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
         if ($payment->status != PaymentsRepository::STATUS_PAID && $data['state'] == self::STATE_PAID) {
             if ((boolean) $payment->payment_gateway->is_recurrent) {
                 $recurrentPayment = $this->recurrentPaymentsRepository->findByPayment($payment);
-                $this->recurrentPaymentsProcessor->processChargedRecurrent($recurrentPayment, $this->getResultCode(), $this->getResultMessage());
+                if ($recurrentPayment) {
+                    $this->recurrentPaymentsProcessor->processChargedRecurrent($recurrentPayment, $this->getResultCode(), $this->getResultMessage());
+                } else {
+                    $this->paymentsRepository->updateStatus($payment, PaymentsRepository::STATUS_PAID, true);
+                }
             } else {
                 $this->paymentsRepository->updateStatus($payment, PaymentsRepository::STATUS_PAID, true);
             }
@@ -73,7 +77,11 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
         if (in_array($data['state'], [self::STATE_CANCELED, self::STATE_TIMEOUTED])) {
             if ((boolean) $payment->payment_gateway->is_recurrent) {
                 $recurrentPayment = $this->recurrentPaymentsRepository->findByPayment($payment);
-                $this->recurrentPaymentsProcessor->processFailedRecurrent($recurrentPayment, $this->getResultCode(), $this->getResultMessage());
+                if ($recurrentPayment) {
+                    $this->recurrentPaymentsProcessor->processFailedRecurrent($recurrentPayment, $this->getResultCode(), $this->getResultMessage());
+                } else {
+                    $this->paymentsRepository->updateStatus($payment, $data['state'] === self::STATE_TIMEOUTED ? PaymentsRepository::STATUS_TIMEOUT : PaymentsRepository::STATUS_FAIL, true);
+                }
             } else {
                 $this->paymentsRepository->updateStatus($payment, $data['state'] === self::STATE_TIMEOUTED ? PaymentsRepository::STATUS_TIMEOUT : PaymentsRepository::STATUS_FAIL, true);
             }
