@@ -2,6 +2,8 @@
 
 namespace Crm\GoPayModule\Gateways;
 
+use Crm\GoPayModule\Notification\InvalidGopayResponseException;
+use Crm\GoPayModule\Notification\PaymentNotFoundException;
 use Crm\PaymentsModule\GatewayFail;
 use Crm\PaymentsModule\Gateways\RecurrentPaymentInterface;
 use Crm\PaymentsModule\Repository\PaymentsRepository;
@@ -40,7 +42,7 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
             ->where(['transaction_reference' => $id])
             ->limit(1)->fetch();
         if (!$gopayMeta) {
-            return false;
+            throw new PaymentNotFoundException('Payment with transaction reference ' . $id . ' not found.');
         }
 
         $payment = $gopayMeta->payment;
@@ -52,6 +54,9 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
         $this->response = $this->gateway->completePurchase($request);
 
         $data = $this->response->getData();
+        if ($data === null) {
+            throw new InvalidGopayResponseException('Empty response from gopay for payment with transaction reference ' . $id);
+        }
         $this->gopayPaymentsRepository->updatePayment($payment, $this->buildGopayPaymentValues($data));
 
         $this->paymentLogsRepository->add(
