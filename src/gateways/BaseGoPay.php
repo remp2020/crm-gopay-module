@@ -2,6 +2,7 @@
 
 namespace Crm\GoPayModule\Gateways;
 
+use Crm\ApplicationModule\Config\ApplicationConfig;
 use Crm\GoPayModule\Repository\GopayPaymentsRepository;
 use Crm\GoPayModule\Repository\GopayPaymentValues;
 use Crm\PaymentsModule\Gateways\GatewayAbstract;
@@ -9,14 +10,13 @@ use Crm\PaymentsModule\RecurrentPaymentsProcessor;
 use Crm\PaymentsModule\Repository\PaymentLogsRepository;
 use Crm\PaymentsModule\Repository\PaymentsRepository;
 use Crm\PaymentsModule\Repository\RecurrentPaymentsRepository;
-use Nette\Database\Table\IRow;
-use Omnipay\GoPay\Gateway;
-use Omnipay\Omnipay;
-use Crm\ApplicationModule\Config\ApplicationConfig;
+use League\Event\Emitter;
 use Nette\Application\LinkGenerator;
+use Nette\Database\Table\IRow;
 use Nette\Http\Response;
 use Nette\Localization\ITranslator;
-use League\Event\Emitter;
+use Omnipay\GoPay\Gateway;
+use Omnipay\Omnipay;
 
 abstract class BaseGoPay extends GatewayAbstract
 {
@@ -185,6 +185,7 @@ abstract class BaseGoPay extends GatewayAbstract
                 'apiaction' => 'notification',
             ]
         );
+        $notifyUrl = str_replace('http://crm.press:8080', 'https://npress-crm.eu.ngrok.io', $notifyUrl);
 
         $paymentItems = $payment->related('payment_items');
         $items = $this->prepareItems($paymentItems);
@@ -245,7 +246,7 @@ abstract class BaseGoPay extends GatewayAbstract
             // EET - see documentation https://doc.gopay.com/cs/#eet
             // we have three fixed VAT level
             $eet['celk_trzba'] += (int)round($paymentItem->amount * $paymentItem->count * 100);
-            if ($paymentItem->vat == 21) {
+            if ($paymentItem->vat == 20) {
                 if (!isset($eet['zakl_dan1'])) {
                     $eet['zakl_dan1'] = 0;
                 }
