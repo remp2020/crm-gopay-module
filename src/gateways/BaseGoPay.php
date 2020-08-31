@@ -185,7 +185,6 @@ abstract class BaseGoPay extends GatewayAbstract
                 'apiaction' => 'notification',
             ]
         );
-        $notifyUrl = str_replace('http://crm.press:8080', 'https://npress-crm.eu.ngrok.io', $notifyUrl);
 
         $paymentItems = $payment->related('payment_items');
         $items = $this->prepareItems($paymentItems);
@@ -246,7 +245,7 @@ abstract class BaseGoPay extends GatewayAbstract
             // EET - see documentation https://doc.gopay.com/cs/#eet
             // we have three fixed VAT level
             $eet['celk_trzba'] += (int)round($paymentItem->amount * $paymentItem->count * 100);
-            if ($paymentItem->vat == 20) {
+            if ($paymentItem->vat == 21) {
                 if (!isset($eet['zakl_dan1'])) {
                     $eet['zakl_dan1'] = 0;
                 }
