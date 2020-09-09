@@ -15,8 +15,11 @@ use Nette\Application\LinkGenerator;
 use Nette\Database\Table\IRow;
 use Nette\Http\Response;
 use Nette\Localization\ITranslator;
+use Nette\Utils\Json;
 use Omnipay\GoPay\Gateway;
 use Omnipay\Omnipay;
+use Tracy\Debugger;
+use Tracy\ILogger;
 
 abstract class BaseGoPay extends GatewayAbstract
 {
@@ -119,7 +122,22 @@ abstract class BaseGoPay extends GatewayAbstract
             return null;
         }
 
+        // return null state [form] - wait for notification
+        if ($data['state'] == self::STATE_CREATED) {
+            return null;
+        }
+
         return $data['state'] == self::STATE_PAID;
+    }
+
+    public function isNotSettled()
+    {
+        $data = $this->getResponseData();
+        if (empty($data['state'])) {
+            Debugger::log("Gopay response data doesn't include state: " . Json::encode($data), ILogger::WARNING);
+            return false;
+        }
+        return $data['state'] === self::STATE_CREATED;
     }
 
     protected function handleSuccessful($response)
