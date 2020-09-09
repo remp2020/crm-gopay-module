@@ -66,7 +66,7 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
             $payment->id
         );
 
-        if ($payment->status != PaymentsRepository::STATUS_PAID && $data['state'] == self::STATE_PAID) {
+        if ($payment->status != PaymentsRepository::STATUS_PAID && in_array($data['state'], [self::STATE_PAID, self::STATE_AUTHORIZED])) {
             if ((boolean) $payment->payment_gateway->is_recurrent) {
                 $recurrentPayment = $this->recurrentPaymentsRepository->findByPayment($payment);
                 if ($recurrentPayment) {
