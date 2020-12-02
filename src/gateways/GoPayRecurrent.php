@@ -4,6 +4,7 @@ namespace Crm\GoPayModule\Gateways;
 
 use Crm\GoPayModule\Notification\InvalidGopayResponseException;
 use Crm\GoPayModule\Notification\PaymentNotFoundException;
+use Crm\GoPayModule\Notification\UnhandledStateException;
 use Crm\PaymentsModule\GatewayFail;
 use Crm\PaymentsModule\Gateways\RecurrentPaymentInterface;
 use Crm\PaymentsModule\Repository\PaymentsRepository;
@@ -75,18 +76,25 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
         }
         $this->gopayPaymentsRepository->updatePayment($payment, $this->buildGopayPaymentValues($data));
 
+        if (in_array($data['state'], [self::STATE_CREATED, self::STATE_PAYMENT_METHOD_CHOSEN])) {
+            // these states can be ignored, the payment should stay in form state
+            return true;
+        }
+
         if (in_array($data['state'], [self::STATE_PAID, self::STATE_AUTHORIZED])) {
-            $this->handleSuccess($payment);
+            $this->handleSuccess($payment, $id);
+            return true;
         }
 
         if (in_array($data['state'], [self::STATE_CANCELED, self::STATE_TIMEOUTED])) {
             $this->handleCanceled($payment, $data['state'] === self::STATE_TIMEOUTED ? PaymentsRepository::STATUS_TIMEOUT : PaymentsRepository::STATUS_FAIL);
+            return true;
         }
 
-        return true;
+        throw new UnhandledStateException('Unhandled gopay state "' . $data['state'] . '" for payment ' . $payment->id . ' with transaction reference ' . $id);
     }
 
-    protected function handleSuccess(IRow $payment)
+    protected function handleSuccess(IRow $payment, string $id)
     {
         if ((boolean) $payment->payment_gateway->is_recurrent) {
             $recurrentPayment = $this->recurrentPaymentsRepository->findByPayment($payment);

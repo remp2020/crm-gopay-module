@@ -10,6 +10,7 @@ use Crm\ApiModule\Params\ParamsProcessor;
 use Crm\GoPayModule\Gateways\GoPayRecurrent;
 use Crm\GoPayModule\Notification\InvalidGopayResponseException;
 use Crm\GoPayModule\Notification\PaymentNotFoundException;
+use Crm\GoPayModule\Notification\UnhandledStateException;
 use Nette\Http\Response;
 use Tracy\Debugger;
 
@@ -61,6 +62,8 @@ class GoPayNotificationHandler extends ApiHandler
             $response->setHttpCode(Response::S400_BAD_REQUEST);
             return $response;
         } catch (PaymentNotFoundException $e) {
+            Debugger::log($e, Debugger::EXCEPTION);
+        } catch (UnhandledStateException $e) {
             Debugger::log($e, Debugger::EXCEPTION);
         }
 

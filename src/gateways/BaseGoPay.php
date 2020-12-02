@@ -29,6 +29,7 @@ abstract class BaseGoPay extends GatewayAbstract
     const STATE_CANCELED = 'CANCELED';
     const STATE_TIMEOUTED = 'TIMEOUTED';
     const STATE_AUTHORIZED = 'AUTHORIZED';
+    const STATE_PAYMENT_METHOD_CHOSEN = 'PAYMENT_METHOD_CHOSEN';
 
     // https://doc.gopay.com/en/#payment-substate
     const PENDING_PAYMENT_SUB_STATE = ['_101', '_102'];
