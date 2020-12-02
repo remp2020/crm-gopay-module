@@ -116,6 +116,10 @@ abstract class BaseGoPay extends GatewayAbstract
         $this->response = $this->gateway->completePurchase($request);
 
         $data = $this->response->getData();
+        // if the gateway does not respond - wait for notification
+        if ($data === null) {
+            return null;
+        }
         $this->gopayPaymentsRepository->updatePayment($payment, $this->buildGopayPaymentValues($data));
 
         if (isset($data['sub_state']) && in_array($data['sub_state'], self::PENDING_PAYMENT_SUB_STATE)) {
