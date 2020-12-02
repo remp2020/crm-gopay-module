@@ -29,6 +29,7 @@ abstract class BaseGoPay extends GatewayAbstract
     const STATE_CANCELED = 'CANCELED';
     const STATE_TIMEOUTED = 'TIMEOUTED';
     const STATE_AUTHORIZED = 'AUTHORIZED';
+    const STATE_PAYMENT_METHOD_CHOSEN = 'PAYMENT_METHOD_CHOSEN';
 
     // https://doc.gopay.com/en/#payment-substate
     const PENDING_PAYMENT_SUB_STATE = ['_101', '_102'];
@@ -116,6 +117,10 @@ abstract class BaseGoPay extends GatewayAbstract
         $this->response = $this->gateway->completePurchase($request);
 
         $data = $this->response->getData();
+        // if the gateway does not respond - wait for notification
+        if ($data === null) {
+            return null;
+        }
         $this->gopayPaymentsRepository->updatePayment($payment, $this->buildGopayPaymentValues($data));
 
         if (isset($data['sub_state']) && in_array($data['sub_state'], self::PENDING_PAYMENT_SUB_STATE)) {
