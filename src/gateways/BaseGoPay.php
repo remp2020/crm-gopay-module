@@ -128,7 +128,7 @@ abstract class BaseGoPay extends GatewayAbstract
         }
 
         // return null state [form] - wait for notification
-        if ($data['state'] == self::STATE_CREATED) {
+        if ($this->isPendingState($data['state'])) {
             return null;
         }
 
@@ -142,7 +142,7 @@ abstract class BaseGoPay extends GatewayAbstract
             Debugger::log("Gopay response data doesn't include state: " . Json::encode($data), ILogger::WARNING);
             return false;
         }
-        return $data['state'] === self::STATE_CREATED;
+        return $this->isPendingState($data['state']);
     }
 
     protected function handleSuccessful($response)
@@ -324,5 +324,10 @@ abstract class BaseGoPay extends GatewayAbstract
             }
         }
         return $this->applicationConfig->get('site_title');
+    }
+
+    protected function isPendingState(string $state): bool
+    {
+        return in_array($state, [self::STATE_CREATED, self::STATE_PAYMENT_METHOD_CHOSEN]);
     }
 }

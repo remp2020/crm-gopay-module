@@ -7,6 +7,8 @@ use Crm\GoPayModule\Notification\PaymentNotFoundException;
 use Crm\GoPayModule\Notification\UnhandledStateException;
 use Crm\PaymentsModule\GatewayFail;
 use Crm\PaymentsModule\Gateways\RecurrentPaymentInterface;
+use Crm\PaymentsModule\RecurrentPaymentFailStop;
+use Crm\PaymentsModule\RecurrentPaymentFailTry;
 use Crm\PaymentsModule\Repository\PaymentsRepository;
 use Nette\Database\Table\IRow;
 use Nette\Utils\DateTime;
@@ -76,7 +78,7 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
         }
         $this->gopayPaymentsRepository->updatePayment($payment, $this->buildGopayPaymentValues($data));
 
-        if (in_array($data['state'], [self::STATE_CREATED, self::STATE_PAYMENT_METHOD_CHOSEN])) {
+        if ($this->isPendingState($data['state'])) {
             // these states can be ignored, the payment should stay in form state
             return true;
         }
@@ -178,7 +180,7 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
         $this->gopayPaymentsRepository->add($payment, $this->response->getTransactionId(), $this->response->getTransactionReference());
         $this->checkChargeStatus($payment, $this->getResultCode());
 
-        if ($this->response->getData()['state'] === self::STATE_CREATED) {
+        if ($this->isPendingState($this->response->getData()['state'])) {
             return self::CHARGE_PENDING;
         }
 
@@ -247,5 +249,16 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
             return null;
         }
         return reset($this->response->getData()['errors']);
+    }
+
+    protected function checkChargeStatus($payment, $resultCode)
+    {
+        if (!$this->isPendingState($this->response->getCode())) {
+            if ($this->hasStopRecurrentPayment($payment, $resultCode)) {
+                throw new RecurrentPaymentFailStop();
+            }
+
+            throw new RecurrentPaymentFailTry();
+        }
     }
 }
