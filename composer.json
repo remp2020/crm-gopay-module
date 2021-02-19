@@ -6,7 +6,7 @@
   "license": "MIT",
   "require": {
     "php": "^7.3",
-    "mikoczy/omnipay-gopay": "^0.8"
+    "mikoczy/omnipay-gopay": "^0.9"
   },
   "minimum-stability": "dev",
   "autoload": {
