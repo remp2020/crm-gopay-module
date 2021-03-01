@@ -37,97 +37,30 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
         return $data;
     }
 
-    public function notification(string $id, ?string $parentId = null): bool
-    {
-        $this->initialize();
-
-        $gopayMeta = $this->gopayPaymentsRepository->getTable()
-            ->where(['transaction_reference' => $id])
-            ->limit(1)->fetch();
-        if (!$gopayMeta) {
-            throw new PaymentNotFoundException('Payment with transaction reference ' . $id . ' not found.');
-        }
-
-        $payment = $gopayMeta->payment;
-
-        $request = [
-            'transactionReference' => $id,
-        ];
-
-        $this->response = $this->gateway->completePurchase($request);
-
-        $data = $this->response->getData();
-        if ($data === null) {
-            throw new InvalidGopayResponseException('Empty response from gopay for payment with transaction reference ' . $id);
-        }
-
-        $this->paymentLogsRepository->add(
-            $this->response->isSuccessful() ? 'OK' : 'ERROR',
-            json_encode($data),
-            $parentId ? 'gopay-notification-recurrent' : 'gopay-notification',
-            $payment->id
-        );
-
-        if ($payment->status !== PaymentsRepository::STATUS_FORM) {
-            return true;
-        }
-
-        if (empty($data['state']) && $this->getError() !== null) {
-            $this->handleCanceled($payment, PaymentsRepository::STATUS_FAIL);
-            return true;
-        }
-        $this->gopayPaymentsRepository->updatePayment($payment, $this->buildGopayPaymentValues($data));
-
-        if ($this->isPendingState($data['state'])) {
-            // these states can be ignored, the payment should stay in form state
-            return true;
-        }
-
-        if (in_array($data['state'], [self::STATE_PAID, self::STATE_AUTHORIZED])) {
-            $this->handleSuccess($payment, $id);
-            return true;
-        }
-
-        if (in_array($data['state'], [self::STATE_CANCELED, self::STATE_TIMEOUTED])) {
-            $this->handleCanceled($payment, $data['state'] === self::STATE_TIMEOUTED ? PaymentsRepository::STATUS_TIMEOUT : PaymentsRepository::STATUS_FAIL);
-            return true;
-        }
-
-        throw new UnhandledStateException('Unhandled gopay state "' . $data['state'] . '" for payment ' . $payment->id . ' with transaction reference ' . $id);
-    }
-
     protected function handleSuccess(IRow $payment, string $id)
     {
-        if ((boolean) $payment->payment_gateway->is_recurrent) {
-            $recurrentPayment = $this->recurrentPaymentsRepository->findByPayment($payment);
-            if ($recurrentPayment) {
-                $this->recurrentPaymentsProcessor->processChargedRecurrent(
-                    $recurrentPayment,
-                    PaymentsRepository::STATUS_PAID,
-                    $this->getResultCode(),
-                    $this->getResultMessage()
-                );
-            } else {
-                $payment = $this->paymentsRepository->updateStatus($payment, PaymentsRepository::STATUS_PAID, true);
-                $this->recurrentPaymentsRepository->createFromPayment(
-                    $payment,
-                    $id
-                );
-            }
+        $recurrentPayment = $this->recurrentPaymentsRepository->findByPayment($payment);
+        if ($recurrentPayment) {
+            $this->recurrentPaymentsProcessor->processChargedRecurrent(
+                $recurrentPayment,
+                PaymentsRepository::STATUS_PAID,
+                $this->getResultCode(),
+                $this->getResultMessage()
+            );
         } else {
-            $this->paymentsRepository->updateStatus($payment, PaymentsRepository::STATUS_PAID, true);
+            $payment = $this->paymentsRepository->updateStatus($payment, PaymentsRepository::STATUS_PAID, true);
+            $this->recurrentPaymentsRepository->createFromPayment(
+                $payment,
+                $id
+            );
         }
     }
 
     protected function handleCanceled(IRow $payment, string $newStatus)
     {
-        if ((boolean) $payment->payment_gateway->is_recurrent) {
-            $recurrentPayment = $this->recurrentPaymentsRepository->findByPayment($payment);
-            if ($recurrentPayment) {
-                $this->recurrentPaymentsProcessor->processFailedRecurrent($recurrentPayment, $this->getResultCode(), $this->getResultMessage());
-            } else {
-                $this->paymentsRepository->updateStatus($payment, $newStatus, true);
-            }
+        $recurrentPayment = $this->recurrentPaymentsRepository->findByPayment($payment);
+        if ($recurrentPayment) {
+            $this->recurrentPaymentsProcessor->processFailedRecurrent($recurrentPayment, $this->getResultCode(), $this->getResultMessage());
         } else {
             $this->paymentsRepository->updateStatus($payment, $newStatus, true);
         }
