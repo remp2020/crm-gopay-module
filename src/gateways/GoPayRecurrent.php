@@ -20,7 +20,7 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
     // https://help.gopay.com/en/knowledge-base/integration-of-payment-gateway/integration-of-payment-gateway-1/recurring-payments
     // This date is not used (but still mandatory), as we use ON_DEMAND recurrent payments and we handle their management ourselves
     // Current maximal date is 2030-12-31 (defined by GoPay backend)
-    private $recurrenceDateTo = '2030-12-31';
+    protected $recurrenceDateTo = '2030-12-31';
 
     public function setRecurrenceDateTo(string $recurrenceDateTo): void
     {
