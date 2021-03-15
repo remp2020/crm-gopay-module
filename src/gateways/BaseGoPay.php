@@ -130,7 +130,6 @@ abstract class BaseGoPay extends GatewayAbstract
         if (isset($data['sub_state']) && in_array($data['sub_state'], self::PENDING_PAYMENT_SUB_STATE)) {
             return null;
         }
-        $data['state'] = self::STATE_CREATED;
 
         // return null state [form] - wait for notification
         if ($this->isPendingState($data['state'])) {
