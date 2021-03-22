@@ -3,6 +3,9 @@
 namespace Crm\GoPayModule\Gateways;
 
 use Crm\ApplicationModule\Config\ApplicationConfig;
+use Crm\GoPayModule\Notification\InvalidGopayResponseException;
+use Crm\GoPayModule\Notification\PaymentNotFoundException;
+use Crm\GoPayModule\Notification\UnhandledStateException;
 use Crm\GoPayModule\Repository\GopayPaymentsRepository;
 use Crm\GoPayModule\Repository\GopayPaymentValues;
 use Crm\PaymentsModule\Gateways\GatewayAbstract;
@@ -12,6 +15,7 @@ use Crm\PaymentsModule\Repository\PaymentsRepository;
 use Crm\PaymentsModule\Repository\RecurrentPaymentsRepository;
 use League\Event\Emitter;
 use Nette\Application\LinkGenerator;
+use Nette\Database\Table\ActiveRow;
 use Nette\Database\Table\IRow;
 use Nette\Http\Response;
 use Nette\Localization\ITranslator;
@@ -133,6 +137,65 @@ abstract class BaseGoPay extends GatewayAbstract
         }
 
         return $data['state'] == self::STATE_PAID;
+    }
+
+    public function notification(ActiveRow $payment, string $id, ?string $parentId = null): bool
+    {
+        $this->initialize();
+        $request = [
+            'transactionReference' => $id,
+        ];
+
+        $this->response = $this->gateway->completePurchase($request);
+
+        $data = $this->response->getData();
+        if ($data === null) {
+            throw new InvalidGopayResponseException('Empty response from gopay for payment with transaction reference ' . $id);
+        }
+
+        $this->paymentLogsRepository->add(
+            $this->response->isSuccessful() ? 'OK' : 'ERROR',
+            json_encode($data),
+            $parentId ? 'gopay-notification-recurrent' : 'gopay-notification',
+            $payment->id
+        );
+
+        if ($payment->status !== PaymentsRepository::STATUS_FORM) {
+            return true;
+        }
+
+        if (empty($data['state']) && $this->getError() !== null) {
+            $this->handleCanceled($payment, PaymentsRepository::STATUS_FAIL);
+            return true;
+        }
+        $this->gopayPaymentsRepository->updatePayment($payment, $this->buildGopayPaymentValues($data));
+
+        if ($this->isPendingState($data['state'])) {
+            // these states can be ignored, the payment should stay in form state
+            return true;
+        }
+
+        if (in_array($data['state'], [self::STATE_PAID, self::STATE_AUTHORIZED])) {
+            $this->handleSuccess($payment, $id);
+            return true;
+        }
+
+        if (in_array($data['state'], [self::STATE_CANCELED, self::STATE_TIMEOUTED])) {
+            $this->handleCanceled($payment, $data['state'] === self::STATE_TIMEOUTED ? PaymentsRepository::STATUS_TIMEOUT : PaymentsRepository::STATUS_FAIL);
+            return true;
+        }
+
+        throw new UnhandledStateException('Unhandled gopay state "' . $data['state'] . '" for payment ' . $payment->id . ' with transaction reference ' . $id);
+    }
+
+    protected function handleSuccess(IRow $payment, string $id)
+    {
+        $this->paymentsRepository->updateStatus($payment, PaymentsRepository::STATUS_PAID, true);
+    }
+
+    protected function handleCanceled(IRow $payment, string $newStatus)
+    {
+        $this->paymentsRepository->updateStatus($payment, $newStatus, true);
     }
 
     public function isNotSettled()
@@ -329,5 +392,13 @@ abstract class BaseGoPay extends GatewayAbstract
     protected function isPendingState(string $state): bool
     {
         return in_array($state, [self::STATE_CREATED, self::STATE_PAYMENT_METHOD_CHOSEN]);
+    }
+
+    protected function getError(): ?array
+    {
+        if (isset($this->response) && empty($this->response->getData()['errors'])) {
+            return null;
+        }
+        return reset($this->response->getData()['errors']);
     }
 }

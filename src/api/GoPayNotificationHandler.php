@@ -7,10 +7,11 @@ use Crm\ApiModule\Authorization\ApiAuthorizationInterface;
 use Crm\ApiModule\Api\ApiHandler;
 use Crm\ApiModule\Params\InputParam;
 use Crm\ApiModule\Params\ParamsProcessor;
-use Crm\GoPayModule\Gateways\GoPayRecurrent;
 use Crm\GoPayModule\Notification\InvalidGopayResponseException;
 use Crm\GoPayModule\Notification\PaymentNotFoundException;
 use Crm\GoPayModule\Notification\UnhandledStateException;
+use Crm\GoPayModule\Repository\GopayPaymentsRepository;
+use Crm\PaymentsModule\GatewayFactory;
 use Nette\Http\Response;
 use Tracy\Debugger;
 
@@ -25,11 +26,16 @@ use Tracy\Debugger;
  */
 class GoPayNotificationHandler extends ApiHandler
 {
-    private $gopay;
+    private $gopayPaymentsRepository;
 
-    public function __construct(GoPayRecurrent $gopay)
-    {
-        $this->gopay = $gopay;
+    private $gatewayFactory;
+
+    public function __construct(
+        GopayPaymentsRepository $gopayPaymentsRepository,
+        GatewayFactory $gatewayFactory
+    ) {
+        $this->gopayPaymentsRepository = $gopayPaymentsRepository;
+        $this->gatewayFactory = $gatewayFactory;
     }
 
     public function params()
@@ -54,8 +60,20 @@ class GoPayNotificationHandler extends ApiHandler
         }
         $params = $paramsProcessor->getValues();
 
+        $gopayMeta = $this->gopayPaymentsRepository->getTable()
+            ->where(['transaction_reference' => $params['id']])
+            ->limit(1)->fetch();
+        if (!$gopayMeta) {
+            Debugger::log('Payment with transaction reference ' . $params['id'] . ' not found.', Debugger::EXCEPTION);
+            $response = new JsonResponse(['status' => 'ok']);
+            $response->setHttpCode(Response::S200_OK);
+            return $response;
+        }
+
+        $payment = $gopayMeta['payment'];
         try {
-            $result = $this->gopay->notification($params['id'], $params['parent_id'] ?? null);
+            $gateway = $this->gatewayFactory->getGateway($payment['payment_gateway']['code']);
+            $result = $gateway->notification($payment, $params['id'], $params['parent_id'] ?? null);
         } catch (InvalidGopayResponseException $e) {
             Debugger::log($e, Debugger::EXCEPTION);
             $response = new JsonResponse(['status' => 'invalid_response']);
