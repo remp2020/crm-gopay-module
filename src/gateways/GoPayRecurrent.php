@@ -176,13 +176,7 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
         return $this->response->getData()['state'] ?? null;
     }
 
-    protected function getError(): ?array
-    {
-        if (isset($this->response) && empty($this->response->getData()['errors'])) {
-            return null;
-        }
-        return reset($this->response->getData()['errors']);
-    }
+
 
     protected function checkChargeStatus($payment, $resultCode)
     {

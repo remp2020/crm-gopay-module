@@ -393,4 +393,12 @@ abstract class BaseGoPay extends GatewayAbstract
     {
         return in_array($state, [self::STATE_CREATED, self::STATE_PAYMENT_METHOD_CHOSEN]);
     }
+
+    protected function getError(): ?array
+    {
+        if (isset($this->response) && empty($this->response->getData()['errors'])) {
+            return null;
+        }
+        return reset($this->response->getData()['errors']);
+    }
 }
