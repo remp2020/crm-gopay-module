@@ -131,11 +131,12 @@ abstract class BaseGoPay extends GatewayAbstract
         }
 
         // return null state [form] - wait for notification
-        if ($this->isPendingState($data['state'])) {
+        $state = $data['state'] ?? null;
+        if ($this->isPendingState($state)) {
             return null;
         }
 
-        return $data['state'] == self::STATE_PAID;
+        return $state == self::STATE_PAID;
     }
 
     public function notification(ActiveRow $payment, string $id, ?string $parentId = null): bool
@@ -388,7 +389,7 @@ abstract class BaseGoPay extends GatewayAbstract
         return $this->applicationConfig->get('site_title');
     }
 
-    protected function isPendingState(string $state): bool
+    protected function isPendingState(?string $state = null): bool
     {
         return in_array($state, [self::STATE_CREATED, self::STATE_PAYMENT_METHOD_CHOSEN]);
     }
