@@ -2,9 +2,9 @@
 
 namespace Crm\GoPayModule\Api;
 
+use Crm\ApiModule\Api\ApiHandler;
 use Crm\ApiModule\Api\JsonResponse;
 use Crm\ApiModule\Authorization\ApiAuthorizationInterface;
-use Crm\ApiModule\Api\ApiHandler;
 use Crm\ApiModule\Params\InputParam;
 use Crm\ApiModule\Params\ParamsProcessor;
 use Crm\GoPayModule\Notification\InvalidGopayResponseException;
