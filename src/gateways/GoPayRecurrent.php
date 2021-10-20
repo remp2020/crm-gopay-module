@@ -7,7 +7,7 @@ use Crm\PaymentsModule\Gateways\RecurrentPaymentInterface;
 use Crm\PaymentsModule\RecurrentPaymentFailStop;
 use Crm\PaymentsModule\RecurrentPaymentFailTry;
 use Crm\PaymentsModule\Repository\PaymentsRepository;
-use Nette\Database\Table\IRow;
+use Nette\Database\Table\ActiveRow;
 use Nette\Utils\DateTime;
 use Tracy\Debugger;
 
@@ -26,7 +26,7 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
         $this->recurrenceDateTo = $recurrenceDateTo;
     }
 
-    protected function preparePaymentData(IRow $payment): array
+    protected function preparePaymentData(ActiveRow $payment): array
     {
         $data = parent::preparePaymentData($payment);
         $data['purchaseData']['recurrence'] = [
@@ -36,7 +36,7 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
         return $data;
     }
 
-    protected function handleSuccess(IRow $payment, string $id)
+    protected function handleSuccess(ActiveRow $payment, string $id)
     {
         $recurrentPayment = $this->recurrentPaymentsRepository->findByPayment($payment);
         if ($recurrentPayment) {
@@ -55,7 +55,7 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
         }
     }
 
-    protected function handleCanceled(IRow $payment, string $newStatus)
+    protected function handleCanceled(ActiveRow $payment, string $newStatus)
     {
         $recurrentPayment = $this->recurrentPaymentsRepository->findByPayment($payment);
         if ($recurrentPayment) {

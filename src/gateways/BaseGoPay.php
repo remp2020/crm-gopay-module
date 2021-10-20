@@ -15,7 +15,6 @@ use Crm\PaymentsModule\Repository\RecurrentPaymentsRepository;
 use League\Event\Emitter;
 use Nette\Application\LinkGenerator;
 use Nette\Database\Table\ActiveRow;
-use Nette\Database\Table\IRow;
 use Nette\Http\Response;
 use Nette\Localization\ITranslator;
 use Nette\Utils\Json;
@@ -188,12 +187,12 @@ abstract class BaseGoPay extends GatewayAbstract
         throw new UnhandledStateException('Unhandled gopay state "' . $data['state'] . '" for payment ' . $payment->id . ' with transaction reference ' . $id);
     }
 
-    protected function handleSuccess(IRow $payment, string $id)
+    protected function handleSuccess(ActiveRow $payment, string $id)
     {
         $this->paymentsRepository->updateStatus($payment, PaymentsRepository::STATUS_PAID, true);
     }
 
-    protected function handleCanceled(IRow $payment, string $newStatus)
+    protected function handleCanceled(ActiveRow $payment, string $newStatus)
     {
         $this->paymentsRepository->updateStatus($payment, $newStatus, true);
     }
@@ -257,7 +256,7 @@ abstract class BaseGoPay extends GatewayAbstract
         return $values;
     }
 
-    protected function preparePaymentData(IRow $payment): array
+    protected function preparePaymentData(ActiveRow $payment): array
     {
         $returnUrl = $this->generateReturnUrl($payment, [
             'vs' => $payment->variable_symbol,
@@ -379,7 +378,7 @@ abstract class BaseGoPay extends GatewayAbstract
         return $eet;
     }
 
-    protected function prepareDescription($paymentItems, IRow $payment): string
+    protected function prepareDescription($paymentItems, ActiveRow $payment): string
     {
         if (count($paymentItems) == 1) {
             foreach ($paymentItems as $paymentItem) {
