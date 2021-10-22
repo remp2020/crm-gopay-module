@@ -15,4 +15,3 @@ services:
 		setup:
 			- registerGateway(gopay, Crm\GoPayModule\Gateways\GoPay)
 			- registerGateway(gopay_recurrent, Crm\GoPayModule\Gateways\GoPayRecurrent)
-
