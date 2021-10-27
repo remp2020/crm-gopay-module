@@ -16,7 +16,7 @@ use League\Event\Emitter;
 use Nette\Application\LinkGenerator;
 use Nette\Database\Table\ActiveRow;
 use Nette\Http\Response;
-use Nette\Localization\ITranslator;
+use Nette\Localization\Translator;
 use Nette\Utils\Json;
 use Omnipay\GoPay\Gateway;
 use Omnipay\Omnipay;
@@ -57,7 +57,7 @@ abstract class BaseGoPay extends GatewayAbstract
         LinkGenerator $linkGenerator,
         ApplicationConfig $applicationConfig,
         Response $httpResponse,
-        ITranslator $translator,
+        Translator $translator,
         GopayPaymentsRepository $gopayPaymentsRepository,
         PaymentsRepository $paymentsRepository,
         RecurrentPaymentsProcessor $recurrentPaymentsProcessor,
