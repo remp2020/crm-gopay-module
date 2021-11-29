@@ -2,7 +2,7 @@
 
 use Phinx\Migration\AbstractMigration;
 
-class AddSubStateField extends AbstractMigration
+class TransactionReferenceIndex extends AbstractMigration
 {
     public function change()
     {
