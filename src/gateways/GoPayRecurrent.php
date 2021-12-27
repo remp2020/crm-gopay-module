@@ -13,6 +13,8 @@ use Tracy\Debugger;
 
 class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
 {
+    public const GATEWAY_CODE = 'gopay_recurrent';
+
     // Maximal recurrenceDateTo according to documentation:
     // https://help.gopay.com/en/knowledge-base/integration-of-payment-gateway/integration-of-payment-gateway-1/recurring-payments
     // This date is not used (but still mandatory), as we use ON_DEMAND recurrent payments and we handle their management ourselves
