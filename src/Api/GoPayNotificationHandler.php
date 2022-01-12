@@ -4,9 +4,9 @@ namespace Crm\GoPayModule\Api;
 
 use Crm\ApiModule\Api\ApiHandler;
 use Crm\ApiModule\Api\JsonResponse;
-use Crm\ApiModule\Authorization\ApiAuthorizationInterface;
 use Crm\ApiModule\Params\InputParam;
 use Crm\ApiModule\Params\ParamsProcessor;
+use Crm\ApiModule\Response\ApiResponseInterface;
 use Crm\GoPayModule\Notification\InvalidGopayResponseException;
 use Crm\GoPayModule\Notification\PaymentNotFoundException;
 use Crm\GoPayModule\Notification\UnhandledStateException;
@@ -46,11 +46,8 @@ class GoPayNotificationHandler extends ApiHandler
         ];
     }
 
-    /**
-     * @param ApiAuthorizationInterface $authorization
-     * @return \Nette\Application\Response
-     */
-    public function handle(ApiAuthorizationInterface $authorization)
+
+    public function handle(array $params): ApiResponseInterface
     {
         $paramsProcessor = new ParamsProcessor($this->params());
         if ($paramsProcessor->isError()) {
