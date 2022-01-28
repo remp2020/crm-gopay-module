@@ -50,7 +50,7 @@ class GoPayNotificationHandler extends ApiHandler
     public function handle(array $params): ApiResponseInterface
     {
         $paramsProcessor = new ParamsProcessor($this->params());
-        if ($paramsProcessor->isError()) {
+        if ($paramsProcessor->hasError()) {
             $response = new JsonResponse(['status' => 'error', 'message' => 'Missing id parameter']);
             $response->setHttpCode(Response::S400_BAD_REQUEST);
             return $response;
