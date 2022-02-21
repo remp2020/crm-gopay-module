@@ -1,16 +1,16 @@
 config:
-	gopay_go_id:
-		name: GoPay Go ID
-		description: "Jedinečný identifikátor predajného miesta (napr. <code>1111111111</code>), pre jeho získanie je potrebné sa zaregistrovať na stránke <a href=\"https://www.gopay.com/en/\">GoPay</a>"
-	gopay_client_id:
-		name: GoPay Client ID
-		description: "Jedinečný identifikátor obchodníka (napr. <code>1111111111</code>), pre jeho získanie je potrebné sa zaregistrovať na stránke <a href=\"https://www.gopay.com/en/\">GoPay</a>"
-	gopay_client_secret:
-		name: GoPay Client secret
-		description: "Šifrovací kľúč GoPay (napr. <code>aaaBBBcD</code>), pre jeho získanie je potrebné sa zaregistrovať na stránke <a href=\"https://www.gopay.com/en/\">GoPay</a>"
-	gopay_test_mode:
-		name: GoPay Test Mode
-		description: "Ak je povolené, všetky platby sa uskutočnujú v testovacom móde, žiadne peniaze nebudú stiahnuté."
-	gopay_eet_enabled:
-		name: GoPay zapnuté EET
-		description: Zapnutý EET reporting z platobnej brany GoPay
+    gopay_go_id:
+        name: GoPay Go ID
+        description: "Jedinečný identifikátor predajného miesta (napr. <code>1111111111</code>), pre jeho získanie je potrebné sa zaregistrovať na stránke <a href=\"https://www.gopay.com/en/\">GoPay</a>"
+    gopay_client_id:
+        name: GoPay Client ID
+        description: "Jedinečný identifikátor obchodníka (napr. <code>1111111111</code>), pre jeho získanie je potrebné sa zaregistrovať na stránke <a href=\"https://www.gopay.com/en/\">GoPay</a>"
+    gopay_client_secret:
+        name: GoPay Client secret
+        description: "Šifrovací kľúč GoPay (napr. <code>aaaBBBcD</code>), pre jeho získanie je potrebné sa zaregistrovať na stránke <a href=\"https://www.gopay.com/en/\">GoPay</a>"
+    gopay_test_mode:
+        name: GoPay Test Mode
+        description: "Ak je povolené, všetky platby sa uskutočnujú v testovacom móde, žiadne peniaze nebudú stiahnuté."
+    gopay_eet_enabled:
+        name: GoPay zapnuté EET
+        description: Zapnutý EET reporting z platobnej brany GoPay
