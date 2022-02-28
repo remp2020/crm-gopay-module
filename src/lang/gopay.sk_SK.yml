@@ -10,7 +10,7 @@ config:
         description: "Šifrovací kľúč GoPay (napr. <code>aaaBBBcD</code>), pre jeho získanie je potrebné sa zaregistrovať na stránke <a href=\"https://www.gopay.com/en/\">GoPay</a>"
     gopay_test_mode:
         name: GoPay Test Mode
-        description: "Ak je povolené, všetky platby sa uskutočnujú v testovacom móde, žiadne peniaze nebudú stiahnuté."
+        description: "Ak je povolené, všetky platby sa uskutočňujú v testovacom móde, žiadne peniaze nebudú stiahnuté."
     gopay_eet_enabled:
         name: GoPay zapnuté EET
-        description: Zapnutý EET reporting z platobnej brany GoPay
+        description: Zapnutý EET reporting z platobnej brány GoPay
