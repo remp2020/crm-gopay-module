@@ -1,5 +1,7 @@
 # CRM GoPay Module
 
+[![Translation status @ Weblate](https://hosted.weblate.org/widgets/remp-crm/-/gopay-module/svg-badge.svg)](https://hosted.weblate.org/projects/remp-crm/gopay-module/)
+
 ## Installation
 
 We recommend using Composer for installation and update management. To add CRM GoPay extension to your [REMP CRM](https://github.com/remp2020/crm-skeleton/) application use following command:
