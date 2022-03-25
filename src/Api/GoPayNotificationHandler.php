@@ -3,16 +3,16 @@
 namespace Crm\GoPayModule\Api;
 
 use Crm\ApiModule\Api\ApiHandler;
-use Crm\ApiModule\Api\JsonResponse;
 use Crm\ApiModule\Params\InputParam;
 use Crm\ApiModule\Params\ParamsProcessor;
-use Crm\ApiModule\Response\ApiResponseInterface;
 use Crm\GoPayModule\Notification\InvalidGopayResponseException;
 use Crm\GoPayModule\Notification\PaymentNotFoundException;
 use Crm\GoPayModule\Notification\UnhandledStateException;
 use Crm\GoPayModule\Repository\GopayPaymentsRepository;
 use Crm\PaymentsModule\GatewayFactory;
 use Nette\Http\Response;
+use Tomaj\NetteApi\Response\JsonApiResponse;
+use Tomaj\NetteApi\Response\ResponseInterface;
 use Tracy\Debugger;
 
 /**
@@ -47,12 +47,11 @@ class GoPayNotificationHandler extends ApiHandler
     }
 
 
-    public function handle(array $params): ApiResponseInterface
+    public function handle(array $params): ResponseInterface
     {
         $paramsProcessor = new ParamsProcessor($this->params());
         if ($paramsProcessor->hasError()) {
-            $response = new JsonResponse(['status' => 'error', 'message' => 'Missing id parameter']);
-            $response->setHttpCode(Response::S400_BAD_REQUEST);
+            $response = new JsonApiResponse(Response::S400_BAD_REQUEST, ['status' => 'error', 'message' => 'Missing id parameter']);
             return $response;
         }
         $params = $paramsProcessor->getValues();
@@ -62,8 +61,7 @@ class GoPayNotificationHandler extends ApiHandler
             ->limit(1)->fetch();
         if (!$gopayMeta) {
             Debugger::log('Payment with transaction reference ' . $params['id'] . ' not found.', Debugger::EXCEPTION);
-            $response = new JsonResponse(['status' => 'ok']);
-            $response->setHttpCode(Response::S200_OK);
+            $response = new JsonApiResponse(Response::S200_OK, ['status' => 'ok']);
             return $response;
         }
 
@@ -73,8 +71,7 @@ class GoPayNotificationHandler extends ApiHandler
             $result = $gateway->notification($payment, $params['id'], $params['parent_id'] ?? null);
         } catch (InvalidGopayResponseException $e) {
             Debugger::log($e, Debugger::EXCEPTION);
-            $response = new JsonResponse(['status' => 'invalid_response']);
-            $response->setHttpCode(Response::S400_BAD_REQUEST);
+            $response = new JsonApiResponse(Response::S400_BAD_REQUEST, ['status' => 'invalid_response']);
             return $response;
         } catch (PaymentNotFoundException $e) {
             Debugger::log($e, Debugger::EXCEPTION);
@@ -82,8 +79,7 @@ class GoPayNotificationHandler extends ApiHandler
             Debugger::log($e, Debugger::EXCEPTION);
         }
 
-        $response = new JsonResponse(['status' => 'ok']);
-        $response->setHttpCode(Response::S200_OK);
+        $response = new JsonApiResponse(Response::S200_OK, ['status' => 'ok']);
 
         return $response;
     }
