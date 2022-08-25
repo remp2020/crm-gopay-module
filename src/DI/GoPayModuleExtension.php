@@ -2,10 +2,10 @@
 
 namespace Crm\GoPayModule\DI;
 
-use Kdyby\Translation\DI\ITranslationProvider;
+use Contributte\Translation\DI\TranslationProviderInterface;
 use Nette\DI\CompilerExtension;
 
-final class GoPayModuleExtension extends CompilerExtension implements ITranslationProvider
+final class GoPayModuleExtension extends CompilerExtension implements TranslationProviderInterface
 {
     private $defaults = [
         'recurrenceDateTo' => null,
@@ -33,7 +33,7 @@ final class GoPayModuleExtension extends CompilerExtension implements ITranslati
      * Return array of directories, that contain resources for translator.
      * @return string[]
      */
-    public function getTranslationResources()
+    public function getTranslationResources(): array
     {
         return [__DIR__ . '/../lang/'];
     }
