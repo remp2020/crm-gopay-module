@@ -263,11 +263,11 @@ abstract class BaseGoPay extends GatewayAbstract
         ]);
 
         $notifyUrl = $this->linkGenerator->link(
-            'Api:Api:api',
+            'Api:Api:default',
             [
                 'version' => 1,
-                'category' => 'gopay',
-                'apiaction' => 'notification',
+                'package' => 'gopay',
+                'apiAction' => 'notification',
             ]
         );
 
