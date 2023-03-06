@@ -125,7 +125,7 @@ abstract class BaseGoPay extends GatewayAbstract
         }
         $this->gopayPaymentsRepository->updatePayment($payment, $this->buildGopayPaymentValues($data));
 
-        if (isset($data['sub_state']) && in_array($data['sub_state'], self::PENDING_PAYMENT_SUB_STATE)) {
+        if (isset($data['sub_state']) && in_array($data['sub_state'], self::PENDING_PAYMENT_SUB_STATE, true)) {
             return null;
         }
 
@@ -174,12 +174,12 @@ abstract class BaseGoPay extends GatewayAbstract
             return true;
         }
 
-        if (in_array($data['state'], [self::STATE_PAID, self::STATE_AUTHORIZED])) {
+        if (in_array($data['state'], [self::STATE_PAID, self::STATE_AUTHORIZED], true)) {
             $this->handleSuccess($payment, $id);
             return true;
         }
 
-        if (in_array($data['state'], [self::STATE_CANCELED, self::STATE_TIMEOUTED])) {
+        if (in_array($data['state'], [self::STATE_CANCELED, self::STATE_TIMEOUTED], true)) {
             $this->handleCanceled($payment, $data['state'] === self::STATE_TIMEOUTED ? PaymentsRepository::STATUS_TIMEOUT : PaymentsRepository::STATUS_FAIL);
             return true;
         }
