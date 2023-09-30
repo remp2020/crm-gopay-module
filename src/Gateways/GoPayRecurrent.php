@@ -149,7 +149,7 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
         return $result;
     }
 
-    public function getResultCode()
+    public function getResultCode(): ?string
     {
         $err = $this->getError();
         if ($err) {
@@ -159,7 +159,7 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
         return $this->response->getData()['state'] ?? null;
     }
 
-    public function getResultMessage()
+    public function getResultMessage(): ?string
     {
         $err = $this->getError();
         if ($err) {
