@@ -76,7 +76,9 @@ abstract class BaseGoPay extends GatewayAbstract
 
     protected function initialize()
     {
-        $this->gateway = Omnipay::create('GoPay');
+        /** @var Gateway $gateway */
+        $gateway = Omnipay::create('GoPay');
+        $this->gateway = $gateway;
 
         $this->gateway->initialize([
             'goId' => $this->applicationConfig->get('gopay_go_id'),
