@@ -2,9 +2,9 @@
 
 namespace Crm\GoPayModule\Api;
 
-use Crm\ApiModule\Api\ApiHandler;
-use Crm\ApiModule\Params\InputParam;
-use Crm\ApiModule\Params\ParamsProcessor;
+use Crm\ApiModule\Models\Api\ApiHandler;
+use Crm\ApiModule\Models\Params\InputParam;
+use Crm\ApiModule\Models\Params\ParamsProcessor;
 use Crm\GoPayModule\Notification\InvalidGopayResponseException;
 use Crm\GoPayModule\Notification\PaymentNotFoundException;
 use Crm\GoPayModule\Notification\UnhandledStateException;
