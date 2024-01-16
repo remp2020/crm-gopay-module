@@ -6,7 +6,7 @@ services:
 	- Crm\GoPayModule\Seeders\ConfigsSeeder
 	- Crm\GoPayModule\Seeders\PaymentGatewaysSeeder
 	- Crm\GoPayModule\Api\GoPayNotificationHandler
-	- Crm\GoPayModule\Repository\GopayPaymentsRepository
+	- Crm\GoPayModule\Repositories\GopayPaymentsRepository
 
 	goPay: Crm\GoPayModule\Gateways\GoPay
 	goPayRecurrent: Crm\GoPayModule\Gateways\GoPayRecurrent
