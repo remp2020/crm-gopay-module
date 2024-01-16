@@ -3,6 +3,7 @@
 namespace Crm\GoPayModule;
 
 use Crm\ApiModule\Api\ApiRoutersContainerInterface;
+use Crm\ApiModule\Authorization\NoAuthorization;
 use Crm\ApiModule\Router\ApiIdentifier;
 use Crm\ApiModule\Router\ApiRoute;
 use Crm\ApplicationModule\CrmModule;
@@ -19,7 +20,7 @@ class GoPayModule extends CrmModule
             new ApiRoute(
                 new ApiIdentifier('1', 'gopay', 'notification'),
                 GoPayNotificationHandler::class,
-                \Crm\ApiModule\Authorization\NoAuthorization::class
+                NoAuthorization::class
             )
         );
     }
