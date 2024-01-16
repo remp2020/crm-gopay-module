@@ -1,6 +1,6 @@
 <?php
 
-namespace Crm\GoPayModule\Repository;
+namespace Crm\GoPayModule\Repositories;
 
 use Crm\ApplicationModule\Repository;
 use Nette\Database\Table\ActiveRow;

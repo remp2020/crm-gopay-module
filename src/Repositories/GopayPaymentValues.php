@@ -1,6 +1,6 @@
 <?php
 
-namespace Crm\GoPayModule\Repository;
+namespace Crm\GoPayModule\Repositories;
 
 class GopayPaymentValues
 {
