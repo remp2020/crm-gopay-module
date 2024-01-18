@@ -9,7 +9,7 @@ use Crm\GoPayModule\Notification\InvalidGopayResponseException;
 use Crm\GoPayModule\Notification\PaymentNotFoundException;
 use Crm\GoPayModule\Notification\UnhandledStateException;
 use Crm\GoPayModule\Repositories\GopayPaymentsRepository;
-use Crm\PaymentsModule\GatewayFactory;
+use Crm\PaymentsModule\Models\GatewayFactory;
 use Nette\Http\Response;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 use Tomaj\NetteApi\Response\ResponseInterface;
