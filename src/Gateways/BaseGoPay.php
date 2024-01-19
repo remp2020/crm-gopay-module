@@ -2,7 +2,7 @@
 
 namespace Crm\GoPayModule\Gateways;
 
-use Crm\ApplicationModule\Config\ApplicationConfig;
+use Crm\ApplicationModule\Models\Config\ApplicationConfig;
 use Crm\GoPayModule\Notification\InvalidGopayResponseException;
 use Crm\GoPayModule\Notification\UnhandledStateException;
 use Crm\GoPayModule\Repositories\GopayPaymentValues;
