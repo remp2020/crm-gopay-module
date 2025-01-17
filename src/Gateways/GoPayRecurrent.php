@@ -106,7 +106,7 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
             $this->response = $this->gateway->recurrence($data);
         } catch (\Exception $exception) {
             Debugger::log($exception);
-            throw new GatewayFail($exception->getMessage(), $exception->getCode());
+            throw new GatewayFail($exception->getMessage(), $exception->getCode(), $exception);
         }
 
         $this->gopayPaymentsRepository->add($payment, $this->response->getTransactionId(), $this->response->getTransactionReference());
