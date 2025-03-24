@@ -4,7 +4,6 @@ namespace Crm\GoPayModule\Api;
 
 use Crm\ApiModule\Models\Api\ApiHandler;
 use Crm\ApiModule\Models\Params\InputParam;
-use Crm\ApiModule\Models\Params\ParamsProcessor;
 use Crm\GoPayModule\Notification\InvalidGopayResponseException;
 use Crm\GoPayModule\Notification\PaymentNotFoundException;
 use Crm\GoPayModule\Notification\UnhandledStateException;
@@ -49,9 +48,6 @@ class GoPayNotificationHandler extends ApiHandler
 
     public function handle(array $params): ResponseInterface
     {
-        $paramsProcessor = new ParamsProcessor($this->params());
-        $params = $paramsProcessor->getValues();
-
         $gopayMeta = $this->gopayPaymentsRepository->getTable()
             ->where(['transaction_reference' => $params['id']])
             ->limit(1)->fetch();
