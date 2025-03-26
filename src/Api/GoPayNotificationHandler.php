@@ -3,13 +3,13 @@
 namespace Crm\GoPayModule\Api;
 
 use Crm\ApiModule\Models\Api\ApiHandler;
-use Crm\ApiModule\Models\Params\InputParam;
 use Crm\GoPayModule\Notification\InvalidGopayResponseException;
 use Crm\GoPayModule\Notification\PaymentNotFoundException;
 use Crm\GoPayModule\Notification\UnhandledStateException;
 use Crm\GoPayModule\Repositories\GopayPaymentsRepository;
 use Crm\PaymentsModule\Models\GatewayFactory;
 use Nette\Http\Response;
+use Tomaj\NetteApi\Params\GetInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 use Tomaj\NetteApi\Response\ResponseInterface;
 use Tracy\Debugger;
@@ -40,8 +40,8 @@ class GoPayNotificationHandler extends ApiHandler
     public function params(): array
     {
         return [
-            new InputParam(InputParam::TYPE_GET, 'id', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_GET, 'parent_id', InputParam::OPTIONAL),
+            (new GetInputParam('id'))->setRequired(),
+            new GetInputParam('parent_id'),
         ];
     }
 
