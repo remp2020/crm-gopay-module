@@ -8,6 +8,7 @@ use Crm\GoPayModule\Notification\UnhandledStateException;
 use Crm\GoPayModule\Repositories\GopayPaymentValues;
 use Crm\GoPayModule\Repositories\GopayPaymentsRepository;
 use Crm\PaymentsModule\Models\Gateways\GatewayAbstract;
+use Crm\PaymentsModule\Models\Payment\PaymentStatusEnum;
 use Crm\PaymentsModule\Models\RecurrentPaymentsProcessor;
 use Crm\PaymentsModule\Repositories\PaymentLogsRepository;
 use Crm\PaymentsModule\Repositories\PaymentsRepository;
@@ -161,12 +162,12 @@ abstract class BaseGoPay extends GatewayAbstract
             $payment->id
         );
 
-        if ($payment->status !== PaymentsRepository::STATUS_FORM) {
+        if ($payment->status !== PaymentStatusEnum::Form->value) {
             return true;
         }
 
         if (empty($data['state']) && $this->getError() !== null) {
-            $this->handleCanceled($payment, PaymentsRepository::STATUS_FAIL);
+            $this->handleCanceled($payment, PaymentStatusEnum::Fail->value);
             return true;
         }
         $this->gopayPaymentsRepository->updatePayment($payment, $this->buildGopayPaymentValues($data));
@@ -182,7 +183,7 @@ abstract class BaseGoPay extends GatewayAbstract
         }
 
         if (in_array($data['state'], [self::STATE_CANCELED, self::STATE_TIMEOUTED], true)) {
-            $this->handleCanceled($payment, $data['state'] === self::STATE_TIMEOUTED ? PaymentsRepository::STATUS_TIMEOUT : PaymentsRepository::STATUS_FAIL);
+            $this->handleCanceled($payment, $data['state'] === self::STATE_TIMEOUTED ? PaymentStatusEnum::Timeout->value : PaymentStatusEnum::Fail->value);
             return true;
         }
 
@@ -191,7 +192,7 @@ abstract class BaseGoPay extends GatewayAbstract
 
     protected function handleSuccess(ActiveRow $payment, string $id)
     {
-        $this->paymentsRepository->updateStatus($payment, PaymentsRepository::STATUS_PAID, true);
+        $this->paymentsRepository->updateStatus($payment, PaymentStatusEnum::Paid->value, true);
     }
 
     protected function handleCanceled(ActiveRow $payment, string $newStatus)

@@ -4,9 +4,9 @@ namespace Crm\GoPayModule\Gateways;
 
 use Crm\PaymentsModule\Models\GatewayFail;
 use Crm\PaymentsModule\Models\Gateways\RecurrentPaymentInterface;
+use Crm\PaymentsModule\Models\Payment\PaymentStatusEnum;
 use Crm\PaymentsModule\Models\RecurrentPaymentFailStop;
 use Crm\PaymentsModule\Models\RecurrentPaymentFailTry;
-use Crm\PaymentsModule\Repositories\PaymentsRepository;
 use Nette\Database\Table\ActiveRow;
 use Nette\Utils\DateTime;
 use Tracy\Debugger;
@@ -42,12 +42,12 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
         if ($recurrentPayment) {
             $this->recurrentPaymentsProcessor->processChargedRecurrent(
                 $recurrentPayment,
-                PaymentsRepository::STATUS_PAID,
+                PaymentStatusEnum::Paid->value,
                 $this->getResultCode(),
                 $this->getResultMessage()
             );
         } else {
-            $payment = $this->paymentsRepository->updateStatus($payment, PaymentsRepository::STATUS_PAID, true);
+            $payment = $this->paymentsRepository->updateStatus($payment, PaymentStatusEnum::Paid->value, true);
             $this->recurrentPaymentsRepository->createFromPayment(
                 $payment,
                 $id
