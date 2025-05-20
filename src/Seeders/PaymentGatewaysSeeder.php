@@ -23,7 +23,7 @@ class PaymentGatewaysSeeder implements ISeeder
                 'gopay',
                 24,
                 true,
-                false
+                false,
             );
             $output->writeln('  <comment>* payment gateway <info>gopay</info> created</comment>');
         } else {
@@ -36,7 +36,7 @@ class PaymentGatewaysSeeder implements ISeeder
                 'gopay_recurrent',
                 25,
                 true,
-                true
+                true,
             );
             $output->writeln('  <comment>* payment gateway <info>gopay_recurrent</info> created</comment>');
         } else {

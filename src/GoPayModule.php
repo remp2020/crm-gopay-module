@@ -20,8 +20,8 @@ class GoPayModule extends CrmModule
             new ApiRoute(
                 new ApiIdentifier('1', 'gopay', 'notification'),
                 GoPayNotificationHandler::class,
-                NoAuthorization::class
-            )
+                NoAuthorization::class,
+            ),
         );
     }
 

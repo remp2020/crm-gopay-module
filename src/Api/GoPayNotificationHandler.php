@@ -31,7 +31,7 @@ class GoPayNotificationHandler extends ApiHandler
 
     public function __construct(
         GopayPaymentsRepository $gopayPaymentsRepository,
-        GatewayFactory $gatewayFactory
+        GatewayFactory $gatewayFactory,
     ) {
         $this->gopayPaymentsRepository = $gopayPaymentsRepository;
         $this->gatewayFactory = $gatewayFactory;

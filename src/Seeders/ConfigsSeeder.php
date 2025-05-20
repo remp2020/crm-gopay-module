@@ -23,7 +23,7 @@ class ConfigsSeeder implements ISeeder
     public function __construct(
         ConfigCategoriesRepository $configCategoriesRepository,
         ConfigsRepository $configsRepository,
-        ConfigBuilder $configBuilder
+        ConfigBuilder $configBuilder,
     ) {
         $this->configCategoriesRepository = $configCategoriesRepository;
         $this->configsRepository = $configsRepository;
@@ -43,7 +43,7 @@ class ConfigsSeeder implements ISeeder
             'gopay.config.gopay_go_id.name',
             'gopay.config.gopay_go_id.description',
             null,
-            $sorting++
+            $sorting++,
         );
 
         $this->addConfig(
@@ -54,7 +54,7 @@ class ConfigsSeeder implements ISeeder
             'gopay.config.gopay_client_id.name',
             'gopay.config.gopay_client_id.description',
             null,
-            $sorting++
+            $sorting++,
         );
 
         $this->addConfig(
@@ -65,7 +65,7 @@ class ConfigsSeeder implements ISeeder
             'gopay.config.gopay_client_secret.name',
             'gopay.config.gopay_client_secret.description',
             null,
-            $sorting++
+            $sorting++,
         );
 
         $this->addConfig(
@@ -76,7 +76,7 @@ class ConfigsSeeder implements ISeeder
             'gopay.config.gopay_eet_enabled.name',
             'gopay.config.gopay_eet_enabled.description',
             0,
-            $sorting++
+            $sorting++,
         );
 
         $this->addConfig(
@@ -87,7 +87,7 @@ class ConfigsSeeder implements ISeeder
             'gopay.config.gopay_test_mode.name',
             'gopay.config.gopay_test_mode.description',
             1,
-            $sorting++
+            $sorting++,
         );
     }
 }

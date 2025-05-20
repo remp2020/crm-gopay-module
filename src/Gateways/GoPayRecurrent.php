@@ -44,13 +44,13 @@ class GoPayRecurrent extends BaseGoPay implements RecurrentPaymentInterface
                 $recurrentPayment,
                 PaymentStatusEnum::Paid->value,
                 $this->getResultCode(),
-                $this->getResultMessage()
+                $this->getResultMessage(),
             );
         } else {
             $payment = $this->paymentsRepository->updateStatus($payment, PaymentStatusEnum::Paid->value, true);
             $this->recurrentPaymentsRepository->createFromPayment(
                 $payment,
-                $id
+                $id,
             );
         }
     }

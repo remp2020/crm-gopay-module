@@ -64,7 +64,7 @@ abstract class BaseGoPay extends GatewayAbstract
         RecurrentPaymentsProcessor $recurrentPaymentsProcessor,
         PaymentLogsRepository $paymentLogsRepository,
         RecurrentPaymentsRepository $recurrentPaymentsRepository,
-        Emitter $eventEmitter
+        Emitter $eventEmitter,
     ) {
         parent::__construct($linkGenerator, $applicationConfig, $httpResponse, $translator);
         $this->paymentsRepository = $paymentsRepository;
@@ -159,7 +159,7 @@ abstract class BaseGoPay extends GatewayAbstract
             $this->response->isSuccessful() ? 'OK' : 'ERROR',
             json_encode($data),
             $parentId ? 'gopay-notification-recurrent' : 'gopay-notification',
-            $payment->id
+            $payment->id,
         );
 
         if ($payment->status !== PaymentStatusEnum::Form->value) {
@@ -271,7 +271,7 @@ abstract class BaseGoPay extends GatewayAbstract
                 'version' => 1,
                 'package' => 'gopay',
                 'apiAction' => 'notification',
-            ]
+            ],
         );
 
         $paymentItems = $payment->related('payment_items');
